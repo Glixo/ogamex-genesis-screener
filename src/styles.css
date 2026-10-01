@@ -1,0 +1,91 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-glow: var(--glow);
+}
+
+:root {
+  --radius: 0.625rem;
+  /* OGameX space theme — deep blue / black with light blue accents */
+  --background: oklch(0.13 0.028 264);
+  --foreground: oklch(0.93 0.015 240);
+  --card: oklch(0.17 0.035 264);
+  --card-foreground: oklch(0.93 0.015 240);
+  --popover: oklch(0.19 0.04 264);
+  --popover-foreground: oklch(0.93 0.015 240);
+  --primary: oklch(0.75 0.14 220);
+  --primary-foreground: oklch(0.13 0.028 264);
+  --secondary: oklch(0.22 0.045 264);
+  --secondary-foreground: oklch(0.9 0.02 230);
+  --muted: oklch(0.22 0.045 264);
+  --muted-foreground: oklch(0.65 0.03 250);
+  --accent: oklch(0.28 0.06 250);
+  --accent-foreground: oklch(0.9 0.05 220);
+  --destructive: oklch(0.6 0.2 25);
+  --destructive-foreground: oklch(0.95 0.01 25);
+  --border: oklch(0.28 0.05 260);
+  --input: oklch(0.25 0.045 260);
+  --ring: oklch(0.75 0.14 220);
+  --glow: oklch(0.75 0.14 220 / 40%);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    background-image:
+      radial-gradient(1px 1px at 12% 22%, oklch(0.85 0.05 220 / 55%) 50%, transparent 50%),
+      radial-gradient(1px 1px at 68% 8%, oklch(0.85 0.05 220 / 40%) 50%, transparent 50%),
+      radial-gradient(1.5px 1.5px at 38% 58%, oklch(0.85 0.05 220 / 45%) 50%, transparent 50%),
+      radial-gradient(1px 1px at 85% 40%, oklch(0.85 0.05 220 / 35%) 50%, transparent 50%),
+      radial-gradient(1.5px 1.5px at 22% 78%, oklch(0.85 0.05 220 / 40%) 50%, transparent 50%),
+      radial-gradient(1px 1px at 55% 88%, oklch(0.85 0.05 220 / 50%) 50%, transparent 50%),
+      radial-gradient(1px 1px at 92% 70%, oklch(0.85 0.05 220 / 30%) 50%, transparent 50%),
+      radial-gradient(1px 1px at 5% 55%, oklch(0.85 0.05 220 / 35%) 50%, transparent 50%);
+  }
+}
+
+@utility glow-ring {
+  box-shadow: 0 0 0 1px var(--color-ring), 0 0 24px var(--color-glow);
+}
+
+@utility text-glow {
+  text-shadow: 0 0 18px var(--color-glow);
+}
