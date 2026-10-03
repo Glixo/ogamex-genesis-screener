@@ -1,8 +1,10 @@
 {
   "name": "tanstack_start_ts",
+  "version": "1.0.5",
   "private": true,
   "sideEffects": false,
   "type": "module",
+  "main": "electron.cjs",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -92,5 +94,40 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "8.1.5"
+  },
+  "build": {
+    "appId": "com.florent.ogamexgenesis",
+    "productName": "OGameX Genesis Screener",
+    "artifactName": "OGameX-Genesis-Screener-Setup-${version}.${ext}",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron.cjs",
+      "electron-config.cjs",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": ".output",
+        "to": ".output"
+      }
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Glixo",
+        "repo": "ogamex-genesis-screener"
+      }
+    ]
   }
 }

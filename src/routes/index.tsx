@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, Moon as MoonIcon, Rocket, Search, Satellite } from "lucide-react";
+import { Check, Copy, Eye, Moon as MoonIcon, Rocket, Search, Satellite } from "lucide-react";
 import {
   getPlayerPlanets,
   isSupabaseConfigured,
   searchPlayers,
+  addWatchedPlayer,
   type PlanetRow,
 } from "@/lib/supabase";
 import { ElectronAuthGate } from "@/components/ElectronAuthGate";
+import { WatchList } from "@/components/WatchList";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -43,14 +45,32 @@ function Page() {
   if (electron === "1") {
     return (
       <ElectronAuthGate>
-        <Index />
+        <Index electron />
       </ElectronAuthGate>
     );
   }
   return <Index />;
 }
 
-function Index() {
+function Index({ electron = false }: { electron?: boolean }) {
+  const [tab, setTab] = useState<"search" | "watch">("search");
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [watchState, setWatchState] = useState<"idle" | "busy" | "done" | "error">("idle");
+  const [watchError, setWatchError] = useState<string | null>(null);
+
+  async function addToWatch() {
+    if (!selectedPlayerId || !selectedPlayer) return;
+    setWatchState("busy");
+    setWatchError(null);
+    try {
+      await addWatchedPlayer(selectedPlayerId, selectedPlayer);
+      setWatchState("done");
+    } catch (e) {
+      setWatchState("error");
+      setWatchError((e as { message?: string })?.message ?? "Échec de l'ajout.");
+    }
+  }
+
   const configured = useMemo(() => isSupabaseConfigured(), []);
 
   const [query, setQuery] = useState("");
@@ -115,6 +135,9 @@ function Index() {
     setShowSuggestions(false);
     setQuery(player.Player);
     setSelectedPlayer(player.Player);
+    setSelectedPlayerId(player.PlayerId);
+    setWatchState("idle");
+    setWatchError(null);
     setLoadingPlanets(true);
     setPlanets(null);
     setError(null);
@@ -155,7 +178,29 @@ function Index() {
         </p>
       </header>
 
-      {!configured ? (
+      {electron && (
+        <nav className="mt-8 flex justify-center gap-2">
+          {(["search", "watch"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              className={`inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
+                tab === t
+                  ? "border-primary bg-primary/15 text-primary"
+                  : "border-border bg-card text-muted-foreground hover:bg-accent"
+              }`}
+            >
+              {t === "search" ? <Search className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {t === "search" ? "Recherche" : "Surveillance"}
+            </button>
+          ))}
+        </nav>
+      )}
+
+      {electron && tab === "watch" ? (
+        <WatchList />
+      ) : !configured ? (
         <div className="mt-14 rounded-xl border border-dashed border-border bg-card/60 p-8 text-center">
           <Satellite className="mx-auto h-10 w-10 text-muted-foreground" />
           <h2 className="mt-4 text-lg font-semibold">Base de données non connectée</h2>
@@ -249,6 +294,21 @@ function Index() {
                   </p>
                 </div>
               </div>
+
+              {electron && selectedPlayerId && (
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={addToWatch}
+                    disabled={watchState === "busy" || watchState === "done"}
+                    className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+                  >
+                    {watchState === "done" ? <Check className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {watchState === "done" ? "Ajouté à la surveillance" : watchState === "busy" ? "Ajout…" : "Ajouter à la surveillance"}
+                  </button>
+                  {watchError && <span className="text-sm text-destructive">{watchError}</span>}
+                </div>
+              )}
 
               <div className="mt-6 overflow-x-auto rounded-xl border border-border bg-card">
                 <table className="w-full min-w-[480px] text-left text-sm">
