@@ -5,11 +5,28 @@ const { spawn } = require('child_process');
 const http = require('http');
 const { autoUpdater } = require('electron-updater');
 
-require('dotenv').config({
-  path: path.join(__dirname, '.env'),
-});
-
 const electronConfig = require('./electron-config.cjs');
+
+/*
+ * Charge le fichier .env uniquement en développement.
+ *
+ * Dans l'application Windows packagée, dotenv n'est pas nécessaire
+ * et n'est donc jamais chargé.
+ */
+if (!app.isPackaged) {
+  try {
+    require('dotenv').config({
+      path: path.join(__dirname, '.env'),
+    });
+
+    console.log('Fichier .env chargé en mode développement.');
+  } catch (error) {
+    console.warn(
+      'Impossible de charger dotenv en développement :',
+      error?.message || String(error)
+    );
+  }
+}
 
 let serverProcess;
 let logFile;
@@ -300,11 +317,6 @@ app.whenReady().then(async () => {
 
       env: serverEnv,
 
-      /*
-       * TEMPORAIRE POUR LE DIAGNOSTIC.
-       * Cela permet de voir les erreurs du serveur
-       * directement dans le CMD.
-       */
       stdio: 'inherit',
 
       windowsHide: true,
